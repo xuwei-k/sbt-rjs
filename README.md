@@ -79,7 +79,7 @@ import RjsKeys._
 
 ...
 
-modules := modules.value ++ Seq(Map("name" -> j"foo/bar/bip", "exclude" -> Seq(j"foo/bar/bop").toJS))
+modules += Map("name" -> j"foo/bar/bip", "exclude" -> Seq(j"foo/bar/bop").toJS)
 ```
 
 The plugin is built on top of [JavaScript Engine](https://github.com/typesafehub/js-engine) which supports different JavaScript runtimes.
