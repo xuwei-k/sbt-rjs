@@ -1,4 +1,5 @@
 import RjsKeys._
+import WebJs._
 
 lazy val root = (project in file(".")).enablePlugins(SbtWeb)
 
@@ -11,17 +12,6 @@ libraryDependencies ++= Seq(
 
 pipelineStages := Seq(rjs)
 
-appBuildProfile := s"""|({
-                       |  appDir: "${appDir.value}",
-                       |  baseUrl: "js",
-                       |  dir: "${dir.value}",
-                       |  generateSourceMaps: true,
-                       |  mainConfigFile: "${appDir.value / "js" / "main.js"}",
-                       |  modules: [{
-                       |    name: "main"
-                       |  }],
-                       |  onBuildWrite: ${buildWriter.value},
-                       |  optimize: "uglify2",
-                       |  paths: ${RjsJson.toJsonObj(webJarModuleIds.value.map(m => m -> "empty:"))},
-                       |  preserveLicenseComments: false
-                       |})""".stripMargin
+//buildProfile := Map("locale" -> j"en-au")
+
+//modules := modules.value ++ Seq(Map("name" -> j"foo/bar/bip", "exclude" -> Seq(j"foo/bar/bop").toJS))

@@ -26,43 +26,60 @@ that all WebJar sourced resources are located via a CDN along with their minifie
 
 RequireJs optimization [permits build profiles](http://requirejs.org/docs/optimization.html#basics)
 to be declared that specify what needs to be done. A standard build profile for the RequireJS optimizer is provided.
-However if you need to provide your own build profile then declare an `appBuildProfile` function in your build.
-The following build profile is the direct equivalent of
-[the one recommended in the rjs documentation for whole project builds](http://requirejs.org/docs/optimization.html#wholeproject):
+You are able to use and/or customize settings already made, and add your own. Here are a list of relevant settings and
+their meanings:
+
+Option                  | Description
+------------------------|------------
+appBuildProfile         | The project build profile contents.
+appDir                  | The top level directory that contains your app js files. In effect, this is the source folder that rjs reads from.
+baseUrl                 | The dir relative to the assets or public folder where js files are housed. Will default to "js", "javascripts" or "." with the latter if the other two cannot be found.
+buildProfile            | Build profile key -> value settings in addition to the defaults supplied by appBuildProfile. Any settings in here will also replace any defaults.
+buildWriter             | The project build writer JS that is responsible for writing out source files in rjs.
+dir                     | By default, all modules are located relative to this path. In effect this is the target directory for rjs.
+generateSourceMaps      | By default, source maps are generated.
+mainModule              | By default, 'main' is used as the module.
+modules                 | The json array of modules.
+optimize                | The name of the optimizer, defaults to uglify2.
+paths                   | A set of RequireJS path mappings. By default all WebJar libraries are made available from a CDN and their mappings can be found here (unless the cdn is set to None).
+preserveLicenseComments | Whether to preserve comments or not. Defaults to false given source maps (see http://requirejs.org/docs/errors.html#sourcemapcomments).
+webjarCdn               | A CDN to be used for locating WebJars. By default jsdelivr is used.
+webJarModuleIds         | A sequence of webjar module ids to be used.
+
+Supposing that your application does not use "main.js" as its main entry point and instead uses `app.js`:
 
 ```scala
-import RjsKeys._
-
-appBuildProfile := s"""|({
-                       |  appDir: "${appDir.value}",
-                       |  baseUrl: "js",
-                       |  dir: "${dir.value}",
-                       |  modules: [
-                       |      {
-                       |           name: "main"
-                       |      }
-                       |  ]
-                       |})""".stripMargin
+RjsKeys.mainModule := "app"
 ```
 
-The standard build profile we provide incorporates support for generating source maps, allows for configuration overrides in your
-`main.js` file and optimizes using uglify2. The build profile is as follows:
+(note the absence of the file extension).
+
+If you wish to add a property that this plugin does not provide, but is available to rjs then you can provide a map
+of additional properties. Supposing that you wish to specify the locale to be used:
 
 ```scala
-appBuildProfile := s"""|({
-                       |  appDir: "${appDir.value}",
-                       |  baseUrl: "js",
-                       |  dir: "${dir.value}",
-                       |  generateSourceMaps: true,
-                       |  mainConfigFile: "${appDir.value / "js" / "main.js"}",
-                       |  modules: [{
-                       |    name: "main"
-                       |  }],
-                       |  onBuildWrite: ${buildWriter.value},
-                       |  optimize: "uglify2",
-                       |  paths: ${RjsJson.toJsonObj(webJarModuleIds.value.map(m => m -> "empty:"))},
-                       |  preserveLicenseComments: false
-                       |})""".stripMargin
+import WebJs._
+import RjsKeys._
+
+...
+
+buildProfile := Map("locale" -> j"en-au")
+```
+
+The `j` character preceding the string value takes a String and converts it into a quoted JavaScript string literal. `buildProfile` is a `Map[String, JS]` where
+`JS` is a type that holds JavaScript expressions. `WebJs._` is required to be imported.
+
+`WebJs` also has functions to convert maps and sequences to the JS type via a `toJS` method. For example,
+[given an example from the rjs documentation](https://github.com/jrburke/r.js/blob/master/build/example.build.js#L388)
+you can express:
+
+```scala
+import WebJs._
+import RjsKeys._
+
+...
+
+modules := modules.value ++ Seq(Map("name" -> j"foo/bar/bip", "exclude" -> Seq(j"foo/bar/bop").toJS))
 ```
 
 The plugin is built on top of [JavaScript Engine](https://github.com/typesafehub/js-engine) which supports different JavaScript runtimes.
