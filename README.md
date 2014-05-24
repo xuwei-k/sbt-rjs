@@ -35,9 +35,10 @@ appBuildProfile         | The project build profile contents.
 appDir                  | The top level directory that contains your app js files. In effect, this is the source folder that rjs reads from.
 baseUrl                 | The dir relative to the assets or public folder where js files are housed. Will default to "js", "javascripts" or "." with the latter if the other two cannot be found.
 buildProfile            | Build profile key -> value settings in addition to the defaults supplied by appBuildProfile. Any settings in here will also replace any defaults.
-buildWriter             | The project build writer JS that is responsible for writing out source files in rjs.
 dir                     | By default, all modules are located relative to this path. In effect this is the target directory for rjs.
 generateSourceMaps      | By default, source maps are generated.
+mainConfig              | By default, 'main' is used as the module for configuration.
+mainConfigFile          | The full path to the above.
 mainModule              | By default, 'main' is used as the module.
 modules                 | The json array of modules.
 optimize                | The name of the optimizer, defaults to uglify2.
