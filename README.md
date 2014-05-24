@@ -43,7 +43,7 @@ modules                 | The json array of modules.
 optimize                | The name of the optimizer, defaults to uglify2.
 paths                   | A set of RequireJS path mappings. By default all WebJar libraries are made available from a CDN and their mappings can be found here (unless the cdn is set to None).
 preserveLicenseComments | Whether to preserve comments or not. Defaults to false given source maps (see http://requirejs.org/docs/errors.html#sourcemapcomments).
-webjarCdn               | A CDN to be used for locating WebJars. By default jsdelivr is used.
+webJarCdns              | CDNs to be used for locating WebJars. By default "org.webjars" is mapped to "jsdelivr".
 webJarModuleIds         | A sequence of webjar module ids to be used.
 
 Supposing that your application does not use "main.js" as its main entry point and instead uses `app.js`:
