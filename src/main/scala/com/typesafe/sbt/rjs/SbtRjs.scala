@@ -8,8 +8,6 @@ import com.typesafe.sbt.web.pipeline.Pipeline
 import com.typesafe.sbt.jse.{SbtJsEngine, SbtJsTask}
 import java.nio.charset.Charset
 import java.io.{BufferedReader, InputStreamReader}
-import org.webjars.WebJarAssetLocator
-import java.util.regex.Pattern
 
 object Import {
 
@@ -28,7 +26,7 @@ object Import {
     val optimize = SettingKey[String]("rjs-optimize", "The name of the optimizer, defaults to uglify2.")
     val paths = TaskKey[Map[String, String]]("rjs-paths", "A set of RequireJS path mappings. By default all WebJar libraries are made available from a CDN and their mappings can be found here (unless the cdn is set to None).")
     val preserveLicenseComments = SettingKey[Boolean]("rjs-preserve-license-comments", "Whether to preserve comments or not. Defaults to false given source maps (see http://requirejs.org/docs/errors.html#sourcemapcomments).")
-    val webjarCdn = SettingKey[Option[String]]("rjs-webjar-cdn", "A CDN to be used for locating WebJars. By default jsdelivr is used.")
+    val webJarCdns = SettingKey[Map[String, String]]("rjs-webjar-cdns", """CDNs to be used for locating WebJars. By default "org.webjars" is mapped to "jsdelivr".""")
     val webJarModuleIds = TaskKey[Set[String]]("rjs-webjar-module-ids", "A sequence of webjar module ids to be used.")
   }
 
@@ -66,7 +64,7 @@ object SbtRjs extends AutoPlugin {
     preserveLicenseComments := false,
     resourceManaged in rjs := webTarget.value / rjs.key.label,
     rjs := runOptimizer.dependsOn(webJarsNodeModules in Plugin).value,
-    webjarCdn := Some("http://cdn.jsdelivr.net/webjars"),
+    webJarCdns := Map("org.webjars" -> "http://cdn.jsdelivr.net/webjars"),
     webJarModuleIds := getWebJarModuleIds.value
   )
 
@@ -130,17 +128,10 @@ object SbtRjs extends AutoPlugin {
   }
 
   private def getWebJarPaths: Def.Initialize[Task[Map[String, String]]] = Def.task {
-    import scala.collection.JavaConverters._
-    webjarCdn.value match {
-      case Some(cdn) =>
-        val locator = new WebJarAssetLocator(WebJarAssetLocator.getFullPathIndex(Pattern.compile(".*"), (webJarsClassLoader in Assets).value))
-        locator.getWebJars.asScala.map {
-          entry =>
-            val (module, version) = entry
-            s"$module" -> s"$cdn/$module/$version"
-        }.toMap
-      case _ => Map.empty
-    }
+    libraryDependencies.value.flatMap {
+      m =>
+        webJarCdns.value.get(m.organization).map(cdn => m.name -> s"$cdn/${m.name}/${m.revision}")
+    }.toMap
   }
 
   private def runOptimizer: Def.Initialize[Task[Pipeline.Stage]] = Def.task {

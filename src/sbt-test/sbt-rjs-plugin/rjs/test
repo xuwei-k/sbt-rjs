@@ -10,3 +10,5 @@ $ exists target/web/stage/javascripts/b.js
 $ exists target/web/stage/javascripts/b.js.map
 $ exists target/web/stage/javascripts/b.js.src.js
 
+> checkCdn
+
