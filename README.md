@@ -64,14 +64,13 @@ import RjsKeys._
 
 ...
 
-buildProfile := Map("locale" -> j"en-au")
+buildProfile := JS.Object("locale" -> "en-au")
 ```
 
-The `j` character preceding the string value takes a String and converts it into a quoted JavaScript string literal. `buildProfile` is a `Map[String, JS]` where
-`JS` is a type that holds JavaScript expressions. `WebJs._` is required to be imported.
+`buildProfile` is a `JS.Object`, a map of `String` -> `JS` values. `WebJs.JS` is required to be imported.
 
-`WebJs` also has functions to convert maps and sequences to the JS type via a `toJS` method. For example,
-[given an example from the rjs documentation](https://github.com/jrburke/r.js/blob/master/build/example.build.js#L388)
+`WebJs` automatically converts common types, like strings, numbers, maps, and sequences, to the JS type. For example,
+[given an example from the rjs documentation](https://github.com/jrburke/r.js/blob/2.1.12/build/example.build.js#L387-L397)
 you can express:
 
 ```scala
@@ -80,7 +79,7 @@ import RjsKeys._
 
 ...
 
-modules += Map("name" -> j"foo/bar/bip", "exclude" -> Seq(j"foo/bar/bop").toJS)
+modules += JS.Object("name" -> "foo/bar/bip", "exclude" -> Seq("foo/bar/bop"))
 ```
 
 The plugin is built on top of [JavaScript Engine](https://github.com/typesafehub/js-engine) which supports different JavaScript runtimes.

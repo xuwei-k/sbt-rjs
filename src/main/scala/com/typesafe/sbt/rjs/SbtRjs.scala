@@ -15,17 +15,17 @@ object Import {
   val rjs = TaskKey[Pipeline.Stage]("rjs", "Perform RequireJs optimization on the asset pipeline.")
 
   object RjsKeys {
-    val appBuildProfile = TaskKey[String]("rjs-app-build-profile", "The project build profile contents.")
+    val appBuildProfile = TaskKey[JS.Object]("rjs-app-build-profile", "The project build profile contents.")
     val appDir = SettingKey[File]("rjs-app-dir", "The top level directory that contains your app js files. In effect, this is the source folder that rjs reads from.")
     val baseUrl = TaskKey[String]("rjs-base-url", """The dir relative to the source assets or public folder where js files are housed. Will default to "js", "javascripts" or "." with the latter if the other two cannot be found.""")
-    val buildProfile = TaskKey[Map[String, JS]]("rjs-build-profile", "Build profile key -> value settings in addition to the defaults supplied by appBuildProfile. Any settings in here will also replace any defaults.")
-    val buildWriter = TaskKey[JS]("rjs-build-writer", "The project build writer JS that is responsible for writing out source files in rjs.")
+    val buildProfile = TaskKey[JS.Object]("rjs-build-profile", "Build profile key -> value settings in addition to the defaults supplied by appBuildProfile. Any settings in here will also replace any defaults.")
+    val buildWriter = TaskKey[JavaScript]("rjs-build-writer", "The project build writer JavaScript that is responsible for writing out source files in rjs.")
     val dir = SettingKey[File]("rjs-dir", "By default, all modules are located relative to this path. In effect this is the target directory for rjs.")
     val generateSourceMaps = SettingKey[Boolean]("rjs-generate-source-maps", "By default, source maps are generated.")
     val mainConfig = SettingKey[String]("rjs-main-config", "By default, 'main' is used as the module for configuration.")
     val mainConfigFile = TaskKey[File]("rjs-main-config-file", "The full path to the main configuration file.")
     val mainModule = SettingKey[String]("rjs-main-module", "By default, 'main' is used as the module.")
-    val modules = SettingKey[Seq[Map[String, JS]]]("rjs-modules", "The json array of modules.")
+    val modules = SettingKey[Seq[JS.Object]]("rjs-modules", "The json array of modules.")
     val optimize = SettingKey[String]("rjs-optimize", "The name of the optimizer, defaults to uglify2.")
     val paths = TaskKey[Map[String, (String, String)]]("rjs-paths", "RequireJS path mappings of module ids to a tuple of the build path and production path. By default all WebJar libraries are made available from a CDN and their mappings can be found here (unless the cdn is set to None).")
     val preserveLicenseComments = SettingKey[Boolean]("rjs-preserve-license-comments", "Whether to preserve comments or not. Defaults to false given source maps (see http://requirejs.org/docs/errors.html#sourcemapcomments).")
@@ -53,7 +53,7 @@ object SbtRjs extends AutoPlugin {
     appBuildProfile := getAppBuildProfile.value,
     appDir := (resourceManaged in rjs).value / "appdir",
     baseUrl := getBaseUrl.value,
-    buildProfile := Map.empty,
+    buildProfile := JS.Object.empty,
     buildWriter := getBuildWriter.value,
     dir := appDir.value / "build",
     excludeFilter in rjs := HiddenFileFilter,
@@ -62,7 +62,7 @@ object SbtRjs extends AutoPlugin {
     mainConfig := mainModule.value,
     mainConfigFile := new File(baseUrl.value, mainModule.value + ".js"),
     mainModule := "main",
-    modules := Seq(Map("name" -> j"${mainModule.value}")),
+    modules := Seq(JS.Object("name" -> mainModule.value)),
     optimize := "uglify2",
     paths := getWebJarPaths.value,
     preserveLicenseComments := false,
@@ -74,20 +74,19 @@ object SbtRjs extends AutoPlugin {
 
   val Utf8 = Charset.forName("UTF-8")
 
-  private def getAppBuildProfile: Def.Initialize[Task[String]] = Def.task {
-    val bp = Map(
-      "appDir" -> j"${appDir.value}",
-      "baseUrl" -> j"${baseUrl.value}",
-      "dir" -> j"${dir.value}",
-      "generateSourceMaps" -> JS(generateSourceMaps.value),
-      "mainConfigFile" -> j"${appDir.value / mainConfigFile.value.getPath}",
-      "modules" -> modules.value.map(o => o.toJS).toJS,
+  private def getAppBuildProfile: Def.Initialize[Task[JS.Object]] = Def.task {
+    JS.Object(
+      "appDir" -> appDir.value,
+      "baseUrl" -> baseUrl.value,
+      "dir" -> dir.value,
+      "generateSourceMaps" -> generateSourceMaps.value,
+      "mainConfigFile" -> appDir.value / mainConfigFile.value.getPath,
+      "modules" -> modules.value,
       "onBuildWrite" -> buildWriter.value,
-      "optimize" -> j"${optimize.value}",
-      "paths" -> paths.value.map(m => m._1 -> j"empty:").toJS,
-      "preserveLicenseComments" -> JS(preserveLicenseComments.value)
+      "optimize" -> optimize.value,
+      "paths" -> paths.value.map(m => m._1 -> "empty:"),
+      "preserveLicenseComments" -> preserveLicenseComments.value
     ) ++ buildProfile.value
-    s"""(${bp.toJS.v})"""
   }
 
   private def getBaseUrl: Def.Initialize[Task[String]] = Def.task {
@@ -102,14 +101,14 @@ object SbtRjs extends AutoPlugin {
     dirIfExists("js").orElse(dirIfExists("javascripts")).getOrElse(".")
   }
 
-  private def getBuildWriter: Def.Initialize[Task[JS]] = Def.task {
+  private def getBuildWriter: Def.Initialize[Task[JavaScript]] = Def.task {
     val source = getResourceAsList("buildWriter.js")
       .to[Vector]
       .dropRight(1) :+ s"""})(
-          "${mainConfigFile.value}",
-          ${paths.value.map(e => e._2._1 -> j"${e._2._2}").toJS.v}
+          ${JS(mainConfigFile.value)},
+          ${JS(paths.value.map(e => e._2._1 -> e._2._2))}
           )"""
-    JS(source.mkString("\n"))
+    JavaScript(source.mkString("\n"))
   }
 
   private def getResourceAsList(name: String): List[String] = {
@@ -173,7 +172,7 @@ object SbtRjs extends AutoPlugin {
       )
 
       val targetBuildProfileFile = (resourceManaged in rjs).value / "app.build.js"
-      IO.write(targetBuildProfileFile, appBuildProfile.value, Utf8)
+      IO.write(targetBuildProfileFile, appBuildProfile.value.js, Utf8)
 
       val cacheDirectory = streams.value.cacheDirectory / rjs.key.label
       val runUpdate = FileFunction.cached(cacheDirectory, FilesInfo.hash) {

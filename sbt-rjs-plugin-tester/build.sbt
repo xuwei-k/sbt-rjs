@@ -12,6 +12,6 @@ libraryDependencies ++= Seq(
 
 pipelineStages := Seq(rjs)
 
-//buildProfile := Map("locale" -> j"en-au")
+//buildProfile := JS.Object("locale" -> "en-au")
 
-//modules := modules.value ++ Seq(Map("name" -> j"foo/bar/bip", "exclude" -> Seq(j"foo/bar/bop").toJS))
+//modules += JS.Object("name" -> "foo/bar/bip", "exclude" -> Seq("foo/bar/bop"))
