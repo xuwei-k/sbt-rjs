@@ -24,6 +24,8 @@ resolvers ++= Seq(
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-js-engine" % "1.0.0-RC3")
 
+addSbtPlugin("com.typesafe.sbt" % "sbt-web" % "1.0.0-2014-05-27-a642837")
+
 publishMavenStyle := false
 
 publishTo := {
