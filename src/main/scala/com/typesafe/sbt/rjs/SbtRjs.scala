@@ -133,7 +133,7 @@ object SbtRjs extends AutoPlugin {
       val lib = withSep(webModulesLib.value)
       val config = IO.read(f, Utf8)
       val pathModuleMappings = SortedMap(
-        s"""['"](.*)['"]\\s*:\\s*[\\[]?.*['"].*/$lib(.*)['"]""".r
+        s"""['"]?([^\\s'"]*)['"]?\\s*:\\s*[\\[]?.*['"].*/$lib(.*)['"]""".r
           .findAllIn(config)
           .matchData.map(m => m.subgroups(1) -> m.subgroups(0))
           .toIndexedSeq

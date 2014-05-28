@@ -3,7 +3,7 @@
 requirejs.config({
     paths: {
         'underscore': '../lib/underscorejs/underscore',
-        'myrequire': '../lib/requirejs/require'
+        myrequire: '../lib/requirejs/require'
     },
     shim: {
         'underscore': {
