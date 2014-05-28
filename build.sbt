@@ -4,7 +4,7 @@ organization := "com.typesafe.sbt"
 
 name := "sbt-rjs"
 
-version := "1.0.0-SNAPSHOT"
+version := "1.0.0"
 
 scalaVersion := "2.10.4"
 
@@ -22,9 +22,7 @@ resolvers ++= Seq(
   Resolver.mavenLocal
 )
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-js-engine" % "1.0.0-RC3")
-
-addSbtPlugin("com.typesafe.sbt" % "sbt-web" % "1.0.0-2014-05-27-a642837")
+addSbtPlugin("com.typesafe.sbt" % "sbt-js-engine" % "1.0.0")
 
 publishMavenStyle := false
 
