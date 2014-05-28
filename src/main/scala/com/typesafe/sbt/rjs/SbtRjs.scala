@@ -55,7 +55,7 @@ object SbtRjs extends AutoPlugin {
     baseUrl := getBaseUrl.value,
     buildProfile := JS.Object.empty,
     buildWriter := getBuildWriter.value,
-    dir := appDir.value / "build",
+    dir := (resourceManaged in rjs).value / "build",
     excludeFilter in rjs := HiddenFileFilter,
     generateSourceMaps := true,
     includeFilter in rjs := GlobFilter("*.js") | GlobFilter("*.css") | GlobFilter("*.map"),
@@ -189,11 +189,10 @@ object SbtRjs extends AutoPlugin {
             (timeoutPerSource in rjs).value * optimizerMappings.size
           )
 
-          appDir.value.***.get.toSet
+          dir.value.***.get.toSet
       }
 
-      val dirStr = dir.value.getAbsolutePath
-      val optimizedMappings = runUpdate(Set(appDir.value)).filter(f => f.isFile && f.getAbsolutePath.startsWith(dirStr)).pair(relativeTo(dir.value))
+      val optimizedMappings = runUpdate(appDir.value.***.get.toSet).filter(_.isFile).pair(relativeTo(dir.value))
       (mappings.toSet -- optimizerMappings.toSet ++ optimizedMappings).toSeq
   }
 
