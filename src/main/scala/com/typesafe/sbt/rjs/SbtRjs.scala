@@ -60,7 +60,7 @@ object SbtRjs extends AutoPlugin {
     generateSourceMaps := true,
     includeFilter in rjs := GlobFilter("*.js") | GlobFilter("*.css") | GlobFilter("*.map"),
     mainConfig := mainModule.value,
-    mainConfigFile := new File(baseUrl.value, mainModule.value + ".js"),
+    mainConfigFile := new File(baseUrl.value, mainConfig.value + ".js"),
     mainModule := "main",
     modules := Seq(JS.Object("name" -> mainModule.value)),
     optimize := "uglify2",
