@@ -24,8 +24,10 @@ pipelineStages := Seq(rjs)
 
 You can include your scripts into the web page with the conventional RequireJS setup. E.g.:
 
-    <script data-main="/assets/javascripts/main.js"
-        src="/assets/lib/requirejs/require.js"></script>
+```html
+<script data-main="/javascripts/main.js"
+        src="/lib/requirejs/require.js"></script>
+```
 
 WebJars are treated specially. If a path is referenced that is part of a path belong to a Webjar then the `webjarCdn`
 setting is used to translate it to the CDN. This is all fully automatic and provided as part of a [buildWriter](http://www.ericfeminella.com/blog/2012/03/24/preprocessing-modules-with-requirejs-optimizer/)
