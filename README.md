@@ -3,6 +3,9 @@ sbt-rjs
 
 [![Build Status](https://api.travis-ci.org/sbt/sbt-rjs.png?branch=master)](https://travis-ci.org/sbt/sbt-rjs)
 
+Setup
+-----
+
 An SBT plugin to perform [RequireJs optimization](http://requirejs.org/docs/optimization.html).
 
 To use this plugin use the addSbtPlugin command within your project's `plugins.sbt` file:
@@ -19,10 +22,18 @@ As with all sbt-web asset pipeline plugins you must declare their order of execu
 pipelineStages := Seq(rjs)
 ```
 
+You can include your scripts into the web page with the conventional RequireJS setup. E.g.:
+
+    <script data-main="/assets/javascripts/main.js"
+        src="/assets/lib/requirejs/require.js"></script>
+
 WebJars are treated specially. If a path is referenced that is part of a path belong to a Webjar then the `webjarCdn`
 setting is used to translate it to the CDN. This is all fully automatic and provided as part of a [buildWriter](http://www.ericfeminella.com/blog/2012/03/24/preprocessing-modules-with-requirejs-optimizer/)
 function. Furthermore if a `.bin` or `-bin` equivalent of the resource is available then it is used. The end result is
 that all WebJar sourced resources are located via a CDN along with their minified versions.
+
+Options
+-------
 
 RequireJs optimization [permits build profiles](http://requirejs.org/docs/optimization.html#basics)
 to be declared that specify what needs to be done. A standard build profile for the RequireJS optimizer is provided.
