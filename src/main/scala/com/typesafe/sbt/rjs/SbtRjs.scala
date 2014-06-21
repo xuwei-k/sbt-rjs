@@ -105,7 +105,7 @@ object SbtRjs extends AutoPlugin {
     val source = getResourceAsList("buildWriter.js")
       .to[Vector]
       .dropRight(1) :+ s"""})(
-          ${JS(mainConfigFile.value)},
+          ${JS(unixPath(mainConfigFile.value.toString))},
           ${JS(paths.value.map(e => e._2._1 -> e._2._2))}
           )"""
     JavaScript(source.mkString("\n"))
@@ -130,18 +130,17 @@ object SbtRjs extends AutoPlugin {
      */
     val maybeMainConfigFile = (mappings in Assets).value.find(_._2.startsWith(mainConfigFile.value.getPath)).map(_._1)
     maybeMainConfigFile.fold(Map[String, (String, String)]()) { f =>
-      val lib = withSep(webModulesLib.value)
-      val libEscaped = withEscapedSep(lib)
+      val lib = unixPath(withSep(webModulesLib.value))
       val config = IO.read(f, Utf8)
       val pathModuleMappings = SortedMap(
-        s"""['"]?([^\\s'"]*)['"]?\\s*:\\s*[\\[]?.*['"].*/$libEscaped(.*)['"]""".r
+        s"""['"]?([^\\s'"]*)['"]?\\s*:\\s*[\\[]?.*['"].*/$lib(.*)['"]""".r
           .findAllIn(config)
           .matchData.map(m => m.subgroups(1) -> m.subgroups(0))
           .toIndexedSeq
           : _*
       )
       val webJarLocalPathPrefix = withSep((webJarsDirectory in Assets).value.getPath) + lib
-      val webJarRelPaths = (webJars in Assets).value.map(_.getPath.drop(webJarLocalPathPrefix.size)).toSet
+      val webJarRelPaths = (webJars in Assets).value.map(f => unixPath(f.getPath.drop(webJarLocalPathPrefix.size))).toSet
       def minifiedModulePath(p: String): String = {
         def ifExists(p: String): Option[String] = if (webJarRelPaths.contains(p + ".js")) Some(p) else None
         ifExists(p + ".min").orElse(ifExists(p + "-min")).getOrElse(p)
@@ -198,6 +197,14 @@ object SbtRjs extends AutoPlugin {
   }
 
   private def withSep(p: String): String = if (p.endsWith(java.io.File.separator)) p else p + java.io.File.separator
-  private def withEscapedSep(p: String): String = withSep(p).replace("\\","\\\\")
+
+  /**
+   * Replaces \ -> / so that paths are in UNIX style.
+   * Windows understands them too and as a bonus we have no need to escape them in Regex.
+   * Also / used URIs and using same separator makes various operations on URIs and paths more reliable.
+   * @param p path
+   * @return
+   */
+  private def unixPath(p: String): String = p.replace("\\","/")
 
 }
