@@ -29,6 +29,7 @@ object Import {
     val optimize = SettingKey[String]("rjs-optimize", "The name of the optimizer, defaults to uglify2.")
     val paths = TaskKey[Map[String, (String, String)]]("rjs-paths", "RequireJS path mappings of module ids to a tuple of the build path and production path. By default all WebJar libraries are made available from a CDN and their mappings can be found here (unless the cdn is set to None).")
     val preserveLicenseComments = SettingKey[Boolean]("rjs-preserve-license-comments", "Whether to preserve comments or not. Defaults to false given source maps (see http://requirejs.org/docs/errors.html#sourcemapcomments).")
+    val removeCombined = SettingKey[Boolean]("rjs-remove-combined", "Whether to remove source files. Defaults to true.")
     val webJarCdns = SettingKey[Map[String, String]]("rjs-webjar-cdns", """CDNs to be used for locating WebJars. By default "org.webjars" is mapped to "jsdelivr".""")
   }
 
@@ -66,6 +67,7 @@ object SbtRjs extends AutoPlugin {
     optimize := "uglify2",
     paths := getWebJarPaths.value,
     preserveLicenseComments := false,
+    removeCombined := true,
     resourceManaged in rjs := webTarget.value / rjs.key.label,
     rjs := runOptimizer.dependsOn(webJarsNodeModules in Plugin).value,
     webJarCdns := Map("org.webjars" -> "http://cdn.jsdelivr.net/webjars")
@@ -85,7 +87,8 @@ object SbtRjs extends AutoPlugin {
       "onBuildWrite" -> buildWriter.value,
       "optimize" -> optimize.value,
       "paths" -> paths.value.map(m => m._1 -> "empty:"),
-      "preserveLicenseComments" -> preserveLicenseComments.value
+      "preserveLicenseComments" -> preserveLicenseComments.value,
+      "removeCombined" -> removeCombined.value
     ) ++ buildProfile.value
   }
 
