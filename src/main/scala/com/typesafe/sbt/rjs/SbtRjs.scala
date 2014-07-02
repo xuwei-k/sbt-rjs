@@ -181,7 +181,7 @@ object SbtRjs extends AutoPlugin {
       val cacheDirectory = streams.value.cacheDirectory / rjs.key.label
       val runUpdate = FileFunction.cached(cacheDirectory, FilesInfo.hash) {
         _ =>
-          streams.value.log("Optimizing JavaScript with RequireJS")
+          streams.value.log.info("Optimizing JavaScript with RequireJS")
 
           SbtJsTask.executeJs(
             state.value,
