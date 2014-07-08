@@ -4,7 +4,7 @@ organization := "com.typesafe.sbt"
 
 name := "sbt-rjs"
 
-version := "1.0.3"
+version := "1.0.4-SNAPSHOT"
 
 scalaVersion := "2.10.4"
 
