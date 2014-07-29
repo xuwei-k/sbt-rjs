@@ -1,0 +1,4 @@
+> webStage
+
+$ exists target/web/stage/js/main.js
+$ exists target/web/stage/js/main.js.map
