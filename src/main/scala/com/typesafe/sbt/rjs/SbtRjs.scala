@@ -149,7 +149,7 @@ object SbtRjs extends AutoPlugin {
         ifExists(p + ".min").orElse(ifExists(p + "-min")).getOrElse(p)
       }
       val webJarCdnPaths = for {
-        m <- libraryDependencies.value
+        m <- allDependencies(update.value)
         cdn <- webJarCdns.value.get(m.organization)
       } yield for {
           pm <- pathModuleMappings.from(m.name + "/") if pm._1.startsWith(m.name + "/")
@@ -160,6 +160,12 @@ object SbtRjs extends AutoPlugin {
         }
       webJarCdnPaths.flatten.toMap
     }
+  }
+
+  private def allDependencies(updateReport: UpdateReport): Seq[ModuleID] = {
+    updateReport.filter(
+      configurationFilter(Compile.name) && artifactFilter(`type` = "jar")
+    ).toSeq.map(_._2).distinct
   }
 
   private def runOptimizer: Def.Initialize[Task[Pipeline.Stage]] = Def.task {

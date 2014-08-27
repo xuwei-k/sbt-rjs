@@ -1,6 +1,8 @@
 requirejs.config({
     paths: {
-        'myunderscore': '../lib/underscorejs/underscore'
+        'myunderscore': '../lib/underscorejs/underscore',
+        myknockout: '../lib/knockout/knockout',
+        "myjquery": "../lib/jquery/jquery"
     },
     shim: {
         'underscore': {
