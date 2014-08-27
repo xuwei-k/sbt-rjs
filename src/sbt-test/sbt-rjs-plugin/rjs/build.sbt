@@ -14,3 +14,7 @@ checkCdn := {
     sys.error(s"${RjsKeys.paths.value} is not what we expected")
   }
 }
+
+// Add an extra file to confuse the thing that finds the main.js mapping
+mappings in Assets := (baseDirectory.value / "src" / "main" / "foos" / "javascripts" / "main.js.foo", "javascripts/main.js.foo") +: (mappings in Assets).value
+
