@@ -131,7 +131,7 @@ object SbtRjs extends AutoPlugin {
      * what it really needs to process as opposed to an alternate strategy where all WebJar
      * js files are made known to it (which is slow).
      */
-    val maybeMainConfigFile = (mappings in Assets).value.find(_._2.startsWith(mainConfigFile.value.getPath)).map(_._1)
+    val maybeMainConfigFile = (mappings in Assets).value.find(_._2 == mainConfigFile.value.getPath).map(_._1)
     maybeMainConfigFile.fold(Map[String, (String, String)]()) { f =>
       val lib = unixPath(withSep(webModulesLib.value))
       val config = IO.read(f, Utf8)
