@@ -6,15 +6,15 @@ name := "sbt-rjs"
 
 version := "1.0.8-SNAPSHOT"
 
-scalaVersion := "2.10.4"
+scalaVersion := "2.10.6"
 
 scalacOptions += "-feature"
 
 libraryDependencies ++= Seq(
-  "org.webjars" % "rjs" % "2.1.15"
+  "org.webjars" % "rjs" % "2.2.0"
 )
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-js-engine" % "1.1.1")
+addSbtPlugin("com.typesafe.sbt" % "sbt-js-engine" % "1.1.4")
 
 publishMavenStyle := false
 
