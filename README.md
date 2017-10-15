@@ -10,7 +10,7 @@ An SBT plugin to perform [RequireJs optimization](http://requirejs.org/docs/opti
 
 To use this plugin use the addSbtPlugin command within your project's `plugins.sbt` file:
 
-    addSbtPlugin("com.typesafe.sbt" % "sbt-rjs" % "1.0.9")
+    addSbtPlugin("com.typesafe.sbt" % "sbt-rjs" % "1.0.10")
 
 Your project's build file also needs to enable sbt-web plugins. For example with build.sbt:
 
@@ -97,4 +97,4 @@ modules += JS.Object("name" -> "foo/bar/bip", "exclude" -> Seq("foo/bar/bop"))
 
 The plugin is built on top of [JavaScript Engine](https://github.com/typesafehub/js-engine) which supports different JavaScript runtimes.
 
-&copy; Typesafe Inc., 2014
+&copy; 2014-2017 [Lightbend Inc.](https://www.lightbend.com)
